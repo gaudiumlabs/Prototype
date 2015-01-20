@@ -1,0 +1,13 @@
+
+Goal: Parse Facebook posts and identify the product,qualifiers and meta-data.
+Then produce alternate versions of the posts with modified quantities like price,
+time and location. Finally link the source of the quantities to a db, which can 
+be modified from a friendly interface. For restaurants, it maybe a menu and events 
+entering interface.
+
+ 1) Import library - DONE
+ 2) Test and learn filestream class basics - DONE
+ 3) Use one model of pkg. Sentence tokenizer - DONE
+ 4) Effectively use javadoc
+ 5) Write down what needs to be done for post parsing. 
+ 6) Search the manual for keywords
