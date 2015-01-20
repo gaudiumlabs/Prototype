@@ -1,0 +1,6 @@
+
+The models ought to go in the bin folder at
+C:\PROFESSIONAL\Gaudium Labs\NLPJarFiles\ApacheNLP\apache-opennlp-1.5.3\bin
+Models are bin files.
+http://opennlp.sourceforge.net/models-1.5/
+
