@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Facebook API Playground</name>
+			<type>2</type>
+			<location>C:/PROFESSIONAL/Gaudium Labs/GitHubsRepos/Prototype/Facebook API Playground</location>
+		</link>
+	</linkedResources>
 </projectDescription>

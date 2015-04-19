@@ -8,6 +8,39 @@ entering interface.
  1) Import library - DONE
  2) Test and learn filestream class basics - DONE
  3) Use one model of pkg. Sentence tokenizer - DONE
- 4) Effectively use javadoc
- 5) Write down what needs to be done for post parsing. 
- 6) Search the manual for keywords
+ 
+ 
+ Using Facebook API
+ 
+ 
+ CURRENT:
+
+1) Get a post from facebook - DONE 
+
+2) Write the information to a text file for mining.- DONE
+
+3) Extract the post from all the other feed data - DONE (print the relevant tag)  
+ 
+4) Tokenize the post 
+		Called tokenize class, prepped the string[] of results. 
+		Test now ! see printed output. Use debug functionality.
+
+5) Upload to github !!
+	Create a fork and develop ?
+
+6) SWITCH TO RESTFB library, easier and cleaner
+ 
+ 
+ 5) JUNIT basic understanding
+ 	i) Junit dummy functions
+ 	ii) Write Junit test cases for sentence tokenizer class. 
+ 	
+ 
+ 
+ 6) Git Work
+ 
+ 1) Add sentence tokenizer file
+ 2) Add other to-do text files and learning files
+ 3) Fork a branch
+ 4) Make changes, and do a pull request to gaudium labs
+ 

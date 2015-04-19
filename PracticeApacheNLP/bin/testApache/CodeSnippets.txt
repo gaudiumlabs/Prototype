@@ -1,0 +1,35 @@
+-----Snippet for getting user input indefinitely until "quit"
+
+while(true){
+
+	    	try{
+	    		System.out.println("Enter user Input now");
+	    		BufferedReader buffRead = new BufferedReader(new InputStreamReader(System.in));
+	    		String input = buffRead.readLine();
+	    		if(input.equals("quit")){
+	    			break;
+	    		}
+	    	}
+	    	catch(IOException ioe){
+	    		System.out.println(ioe);	    		
+	    	}
+	    }
+	    
+=============================================================
+
+------snippet to get the list of friends
+
+		try{
+			String accessTokenString = "CAACEdEose0cBAA3gBwyOJLWPa6C3ciCvaOfcPv5HIvGbeTrGUflCvvDIUPH4tncnHFConuEf4wHhmbwZAqLZBuBizjEn6dKBAjrIM5ocLXgH9Ez4ZAd9ujgHmXFXQgCP8pZBL121xYSdOgYppQM2mZATOs4pHrAJ4QAN2l06ZC0BfY74bRULeJCxZCjY7apdaav7O2YdTQ7fuZC7bkqtnVPIydZAOaCF3IccZD";
+			AccessToken at = new AccessToken(accessTokenString);
+			// Set access token.
+
+			facebook.setOAuthAccessToken(at);	    
+			ResponseList<Friend> listOfPals = facebook.getFriends();
+			System.out.println(listOfPals.size());
+		}
+	    catch(FacebookException e){
+	    	e.printStackTrace();
+	    }
+	    
+	    System.out.println("End of program");

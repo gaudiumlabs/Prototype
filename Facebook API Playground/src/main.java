@@ -7,7 +7,7 @@ public class main {
 	    // Get an access token from: 
 	    // https://developers.facebook.com/tools/explorer
 	    // Copy and paste it below.
-	    String accessTokenString = "CAACEdEose0cBALzlZCRhKrrn2Fh3asYObX4xDLn2IXZCUsxRc8ggsIOKOpaEmw1WTTIUnUQMFEVm1bFdS5rjFpz3ochoM1PIrtpWtTcP6MmHG3mq6P43EtPz4OpZBoUiXTDifA7TuY5RSy8ZB1DZAcYuygN2PmkDTj3J7nsTHIB8TK7aB9YsGeXvnyO103dNJJMMfhMNWqeK7tkxNRCfncMtWf4VlnZBsZD";
+	    String accessTokenString = "CAACEdEose0cBAHQAg3E3pP8ZBJwR1TzZC6tbVmRfGeOwyKujjfArGPvbgMMlYcV9A7eKVBzqhlZBJ19ZArw32p3SZCMIIGQZBG2OZA2s1HAkBIpUP8TiASWU2AVvODcC0lF0B3xgPLRzplEqpNZCC0putNqS2ImMZCuJKqx4ZBcu6dDIqZCabassI1TEFZB6kUbZBSn6wK82EhPG2t0qoNN9HdwHWjNGVOD9Mpv8ZD";
 	    AccessToken at = new AccessToken(accessTokenString);
 	    // Set access token.
 	    facebook.setOAuthAccessToken(at);

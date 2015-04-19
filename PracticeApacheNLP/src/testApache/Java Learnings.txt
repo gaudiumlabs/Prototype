@@ -1,0 +1,5 @@
+
+---------------Jar files and Libraries---------------
+
+1) Before including a Jar file or library, make sure it is in the Sources, or projects associated to your code
+	i) Common way to get a jar file from a different folder is to "Link Source". Goto project properties, and edit this under "Source"
