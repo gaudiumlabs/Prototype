@@ -1,0 +1,11 @@
+
+1) To get temp user access tokens (expire)
+	// Get an access token from: 
+	// https://developers.facebook.com/tools/explorer
+	// Copy and paste it below.
+
+2) 	    facebook.setOAuthAppId("", "");// SUPER IMPORTANT
+		// ?? ONLY DONE ONCE ?? WHAT IS IT ASSOCIATED TO ? MY LOGIN?
+	
+	I had to do it atleast once , but there after it complained that the id name pair
+	already existed. Upon commenting out the line, it worked !!

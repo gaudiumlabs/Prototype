@@ -1,0 +1,5 @@
+
+
+  Apache NLTK
+  Facebook API 
+  Apache Commons IO (to use FileUtils)
