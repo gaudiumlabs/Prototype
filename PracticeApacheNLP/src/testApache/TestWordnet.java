@@ -2,18 +2,43 @@ package testApache;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Set;
 
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.item.IIndexWord;
+import edu.mit.jwi.item.ISynset;
 import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
+import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.Sentence;
+import edu.stanford.nlp.ling.TaggedWord;
 
 /**
  * Class to practice using the wordnet api
@@ -30,19 +55,97 @@ public class TestWordnet {
 	};
 
 	public static void main(String[] args) {
-		String exampleSentence = "Selling amazing tickets for a cool concert tonight.";
 
-		//MaxentTagger tagger = new MaxentTagger("taggers/english-bidirectional-distsim.tagger");
-		MaxentTagger tagger = new MaxentTagger("taggers/english-left3words-distsim.tagger");
-		
-		String tagged = tagger.tagString(exampleSentence);
-		
-		System.out.println(tagged);
-		
+		// MaxentTagger tagger = new
+		// MaxentTagger("taggers/english-bidirectional-distsim.tagger");
+		// MaxentTagger tagger = new MaxentTagger(
+		// "taggers/english-left3words-distsim.tagger");
+
+		// String tagged = tagger.tagString(exampleSentence);
+
+		// Set up wordnet
+		// construct the URL to the Wordnet dictionary directory
+		String wnhome = System.getenv("WNHOME");
+		String path = wnhome + File.separator + "dict";
+		System.out.println("Trying path: " + path);
+		URL url = null;
+		try {
+			url = new URL("file", null, path);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// construct the dictionary object and open it
+		IDictionary dict = new Dictionary(url);
+		try {
+			dict.open();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// creates a StanfordCoreNLP object, with POS tagging, lemmatization,
+		// NER, parsing, and coreference resolution
+		Properties props = new Properties();
+		props.setProperty("annotators",
+				"tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+
+		// read some text in the text variable
+		String exampleSentence = "It's warm outside and I'm selling good tickets for a stupid concert tonight.";
+
+		// create an empty Annotation just with the given text
+		Annotation document = new Annotation(exampleSentence);
+
+		// run all Annotators on this text
+		pipeline.annotate(document);
+
+		// these are all the sentences in this document
+		// a CoreMap is essentially a Map that uses class objects as keys and
+		// has values with custom types
+		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+
 		System.out.println("[Starting Sentence] " + exampleSentence);
-		for (String sim : similarSentences(exampleSentence)) {
+		for (String sim : similarSentences(sentences.get(0), dict)) {
 			System.out.println("[New Sentence]     " + sim);
 		}
+
+		for (CoreMap sentence : sentences) {
+			// traversing the words in the current sentence
+			// a CoreLabel is a CoreMap with additional token-specific methods
+			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+				// this is the text of the token
+				String word = token.get(TextAnnotation.class);
+				// this is the POS tag of the token
+				String pos = token.get(PartOfSpeechAnnotation.class);
+				// this is the NER label of the token
+				String ne = token.get(NamedEntityTagAnnotation.class);
+
+//				System.out.println("word = " + word + ", pos = " + pos
+//						+ ", ne = " + ne);
+			}
+
+			// this is the parse tree of the current sentence
+			Tree tree = sentence.get(TreeAnnotation.class);
+
+			// this is the Stanford dependency graph of the current sentence
+			SemanticGraph dependencies = sentence
+					.get(CollapsedCCProcessedDependenciesAnnotation.class);
+		}
+
+		// This is the coreference link graph
+		// Each chain stores a set of mentions that link to each other,
+		// along with a method for getting the most representative mention
+		// Both sentence and token offsets start at 1!
+		Map<Integer, CorefChain> graph = document
+				.get(CorefChainAnnotation.class);
+
+		// System.out.println(tagged);
+
+		// System.out.println("[Starting Sentence] " + exampleSentence);
+		// for (String sim : similarSentences(exampleSentence)) {
+		// System.out.println("[New Sentence]     " + sim);
+		// }
 
 		System.out.println("---EnD oF PrOgRaM---");
 	}
@@ -55,53 +158,131 @@ public class TestWordnet {
 	 * @param sentence
 	 * @return new sentences
 	 */
-	private static ArrayList<String> similarSentences(String sentence) {
+	private static ArrayList<String> similarSentences(CoreMap sentence,
+			IDictionary wordnetDict) {
 		ArrayList<String> similarSentences = new ArrayList<String>();
 
-		
-		
-		try {
-			testDictionary("doesn'tnatter");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		HashMap<String, Set<String>> synonyms = new HashMap<String, Set<String>>();
+
+		for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+			// this is the text of the token
+			String wordStr = token.get(TextAnnotation.class);
+			//System.out.println("wordstr " + wordStr);
+			// this is the POS tag of the token
+			String pos = token.get(PartOfSpeechAnnotation.class);
+
+			if (getWordnetPOSFromStanfordTag(pos) == POS.ADJECTIVE) {
+				HashSet currSet = new HashSet<String>();
+				synonyms.put(wordStr, currSet);
+
+				// look up in wordnet for synonyms
+				IIndexWord idxWord = wordnetDict.getIndexWord(wordStr,
+						getWordnetPOSFromStanfordTag(pos));
+				for (int i = 0; i < idxWord.getWordIDs().size(); i++) {
+					IWordID wordID = idxWord.getWordIDs().get(i);
+					IWord word = wordnetDict.getWord(wordID);
+					// synonym set?
+					ISynset synset = word.getSynset();
+					for (IWord w : synset.getWords()) {
+						// synonyms.get(wordStr).add(w.getLemma().toString()
+						currSet.add(w.getLemma());
+
+					}
+
+				}
+
+			}
+
 		}
-		
-		// tokenize string into an array of words
-		ArrayList<String> words = new ArrayList<String>();
-		ArrayList<WORDTYPE> wordsTypes = new ArrayList<WORDTYPE>();
-		BreakIterator boundary = BreakIterator.getWordInstance();
-		boundary.setText(sentence);
-		String word = "";
-		int wordStartIndex = 0;
-		while (boundary.next() != BreakIterator.DONE) {
-			word = sentence.substring(wordStartIndex, boundary.current());
-			if (!word.trim().isEmpty()) { // ignore any whitespace between words
-				words.add(word);
-				// look up the word in wordnet
+
+		// test to see we get all the sentences
+
+//		System.out.println("Here are the synonyms for all the adjectives:");
+//		for (String adj : synonyms.keySet()) {
+//			System.out.print(adj + ": ");
+//			for (String syn : synonyms.get(adj)) {
+//				System.out.print(syn + ", ");
+//			}
+//			System.out.println();
+//		}
+
+		int numberOfSentencesWeWant = 10;
+		for (int numSent = 0; numSent < numberOfSentencesWeWant; numSent++) {
+			String currentSentence = "";
+			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+				// this is the text of the token
+				String wordStr = token.get(TextAnnotation.class);
+				//System.out.println("wordstr " + wordStr);
+				// this is the POS tag of the token
+				String pos = token.get(PartOfSpeechAnnotation.class);
+
+				
+
+				if (getWordnetPOSFromStanfordTag(pos) == POS.ADJECTIVE) {
+					// use a synonym instead
+					int index = new Random().nextInt(synonyms.get(wordStr)
+							.size());
+					int c = 0;
+					for (String syn : synonyms.get(wordStr)) {
+						if (c == index) {
+							currentSentence += " " + syn;
+							break;
+						}else{
+							c++;
+						}
+					}
+					
+				} else {
+					currentSentence += " " + wordStr;
+				}
+
 				
 			}
-			wordStartIndex = boundary.current();
+			similarSentences.add(currentSentence);
 		}
 
 		return similarSentences;
 
 	}
 
-	private static WORDTYPE testDictionary(String originalWord) throws IOException {
+	/**
+	 * Simple mapping function that returns a wordnet POS (Part of Speech) tag
+	 * from the stanford tag
+	 * 
+	 * To-do: returns null if there is no maping for the input tag (i.e. adverb
+	 * or article). This should be changed in the future.
+	 * 
+	 * @param tag
+	 * @return POS
+	 */
+	private static POS getWordnetPOSFromStanfordTag(String tag) {
+		switch (tag) {
+		case "NN":
+			return POS.NOUN;
+		case "JJ":
+			return POS.ADJECTIVE;
+		case "VBG":
+			return POS.VERB;
+		default:
+			return null;
+		}
+	}
+
+	private static WORDTYPE testDictionary(String originalWord)
+			throws IOException {
 		// construct the URL to the Wordnet dictionary directory
 		String wnhome = System.getenv("WNHOME");
 		String path = wnhome + File.separator + "dict";
-		System.out.println("Trying path: "+path);
+		System.out.println("Trying path: " + path);
 		URL url = new URL("file", null, path);
 		// construct the dictionary object and open it
 		IDictionary dict = new Dictionary(url);
 		dict.open();
 
 		// look up first sense of the word "dog"
-		//IIndexWord idxWord = dict.getIndexWord("dog", POS.NOUN);
+		// IIndexWord idxWord = dict.getIndexWord("dog", POS.NOUN);
 		IIndexWord idxWord = dict.getIndexWord("dog", POS.NOUN);
-		
+
 		IWordID wordID = idxWord.getWordIDs().get(0);
 		IWord word = dict.getWord(wordID);
 		System.out.println("Id = " + wordID);
