@@ -92,7 +92,9 @@ public class TestWordnet {
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
 		// read some text in the text variable
-		String exampleSentence = "It's warm outside and I'm selling good tickets for a stupid concert tonight.";
+		//String exampleSentence = "It's warm outside and I'm selling good tickets for a stupid concert tonight.";
+		//String exampleSentence = "Kostas is a wonderful friend and he makes me happy and inspired";
+		String exampleSentence = "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.";
 
 		// create an empty Annotation just with the given text
 		Annotation document = new Annotation(exampleSentence);
